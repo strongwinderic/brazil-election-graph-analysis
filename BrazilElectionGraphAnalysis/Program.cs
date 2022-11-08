@@ -7,7 +7,7 @@ Console.WriteLine("");
 
 string zippedCsvDirectory = "..\\..\\..\\Data\\DumpFiles";
 string unzippedCsvDirectory = "..\\..\\..\\Data\\DumpFiles\\unzipped";
-string votingInfoFilePath = "..\\..\\..\\Data\\allVotingInfo.json";
+string votingInfoFilePath = "..\\..\\..\\Data\\AggregatedData\\allVotingInfo.json";
 
 var dataBuilder = new DataBuilder(zippedCsvDirectory, unzippedCsvDirectory, votingInfoFilePath);
 try
@@ -57,7 +57,9 @@ Dictionary<int, VotingInfo> GetVotingInfo()
             UnzipTseFiles();
         }
 
-        return dataBuilder.GetAllVotingInfo();
+        var votingInfo = dataBuilder.GetAllVotingInfo();
+        dataBuilder.SaveVotingInfo(votingInfo);
+        return votingInfo;
 
         void UnzipTseFiles()
         {

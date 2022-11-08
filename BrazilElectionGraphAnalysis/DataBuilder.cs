@@ -34,12 +34,14 @@ internal class DataBuilder
 
     internal void SaveVotingInfo(Dictionary<int, VotingInfo> allVotingInfo)
     {
+        Console.WriteLine($"Saving voting info file to {VotingInfoFilePath}");
         string allVotingInfoJson = JsonConvert.SerializeObject(allVotingInfo);
         File.WriteAllText(VotingInfoFilePath, allVotingInfoJson);
     }
 
     internal Dictionary<int, VotingInfo> LoadVotingInfo()
     {
+        Console.WriteLine($"Loading voting info file from {VotingInfoFilePath}");
         string allVotingInfoJson = File.ReadAllText(VotingInfoFilePath);
         var allVotingInfo = JsonConvert.DeserializeObject<Dictionary<int, VotingInfo>>(allVotingInfoJson);
 
