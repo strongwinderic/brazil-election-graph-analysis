@@ -1,21 +1,72 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using BrazilElectionGraphAnalysis;
-using System.Reflection;
 
 Console.WriteLine("Brazil Election Graph Analysis");
+Console.WriteLine("");
 
-string zippedCsvDirectory = "..\\..\\..\\DumpFiles";
-string unzippedCsvDirectory = "..\\..\\..\\DumpFiles\\unzipped";
+string zippedCsvDirectory = "..\\..\\..\\Data\\DumpFiles";
+string unzippedCsvDirectory = "..\\..\\..\\Data\\DumpFiles\\unzipped";
+string votingInfoFilePath = "..\\..\\..\\Data\\allVotingInfo.json";
 
-Console.WriteLine("Unzipping files...");
-DumpFilesReader.Unzip(zippedCsvDirectory, unzippedCsvDirectory);
-
-Console.WriteLine("Aggregating information...");
-var allVotingInfo = DumpFilesReader.GetAllVotingInfo(unzippedCsvDirectory);
-foreach (var votingInfo in allVotingInfo)
+var dataBuilder = new DataBuilder(zippedCsvDirectory, unzippedCsvDirectory, votingInfoFilePath);
+try
 {
-    Console.WriteLine($"Ballot Id: {votingInfo.Value.BallotId} | Lula votes: {votingInfo.Value.LulaVotes} | Bolsonaro votes: {votingInfo.Value.BolsonaroVotes}");
+    Dictionary<int, VotingInfo> allVotingInfo = GetVotingInfo();
+
+    foreach (var votingInfo in allVotingInfo)
+    {
+        Console.WriteLine($"Ballot Id: {votingInfo.Value.BallotId} | Lula votes: {votingInfo.Value.LulaVotes} | Bolsonaro votes: {votingInfo.Value.BolsonaroVotes}");
+    }
+}
+catch (Exception ex)
+{   
+    Console.WriteLine("An error has occurred.");
+    Console.WriteLine($"Error: {ex.Message}");
 }
 
 Console.ReadLine();
+
+Dictionary<int, VotingInfo> GetVotingInfo()
+{
+    bool useVotingInfoFile = false;
+    if (dataBuilder.VotingInfoFileExists())
+    {
+        Console.WriteLine($"Voting file already exists on path {dataBuilder.VotingInfoFilePath}");
+        ConsoleKeyInfo selectedOption;
+        do
+        {
+            Console.WriteLine($"Use existent file? (Y/n)");
+            selectedOption = Console.ReadKey();
+        } while (selectedOption.Key is not (ConsoleKey.Enter or ConsoleKey.Y or ConsoleKey.N));
+
+        useVotingInfoFile = selectedOption.Key is ConsoleKey.Enter or ConsoleKey.Y;
+    }
+
+    return useVotingInfoFile ? dataBuilder.LoadVotingInfo() : BuildVotingInfo();
+
+    Dictionary<int, VotingInfo> BuildVotingInfo()
+    {
+        if (dataBuilder.AreFilesUnzipped())
+        {
+            Console.WriteLine($"TSE data unzipped file already found on directory {dataBuilder.UnzippedCsvDirectory}");
+            Console.WriteLine("Using the unzipped data");
+        }
+        else
+        {
+            UnzipTseFiles();
+        }
+
+        return dataBuilder.GetAllVotingInfo();
+
+        void UnzipTseFiles()
+        {
+            if (!dataBuilder.DirectoryHasAllTseZippedFiles())
+            {
+                throw new Exception($"TSE files could not be found. Please copy all {DataBuilder.TotalTseFiles} zipped TSE files to directory {dataBuilder.ZippedCsvDirectory}");
+            }
+
+            dataBuilder.UnzipCsvFiles();
+        }
+    }
+}

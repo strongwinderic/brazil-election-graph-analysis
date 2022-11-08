@@ -1,10 +1,12 @@
-﻿using System.IO.Compression;
+﻿using Newtonsoft.Json;
+using System.IO.Compression;
 using System.Text;
 
 namespace BrazilElectionGraphAnalysis;
 
-internal static class DumpFilesReader
+internal class DataBuilder
 {
+    public const int TotalTseFiles = 28; // 26 states + federal district + international ballots
     private const int ElectionYearIndex = 2;
     private const int BallotIdIndex = 32;
     private const int ZoneIndex = 13;
@@ -14,28 +16,84 @@ internal static class DumpFilesReader
     private const int VoteNumberIndex = 29;
     private const int VoteQuantityIndex = 31;
 
-    internal static void Unzip(string zippedCsvDirectory, string unzippedCsvDirectory)
+    public string ZippedCsvDirectory { get; set; }
+    public string UnzippedCsvDirectory { get; set; }
+    public string VotingInfoFilePath { get; set; }
+
+    public DataBuilder(string zippedCsvDirectory, string unzippedCsvDirectory, string votingInfoFilePath)
     {
-        if (!Directory.Exists(unzippedCsvDirectory))
+        ZippedCsvDirectory = zippedCsvDirectory;
+        UnzippedCsvDirectory = unzippedCsvDirectory;
+        VotingInfoFilePath = votingInfoFilePath;
+    }
+
+    internal bool VotingInfoFileExists()
+    {
+        return File.Exists(VotingInfoFilePath);
+    }
+
+    internal void SaveVotingInfo(Dictionary<int, VotingInfo> allVotingInfo)
+    {
+        string allVotingInfoJson = JsonConvert.SerializeObject(allVotingInfo);
+        File.WriteAllText(VotingInfoFilePath, allVotingInfoJson);
+    }
+
+    internal Dictionary<int, VotingInfo> LoadVotingInfo()
+    {
+        string allVotingInfoJson = File.ReadAllText(VotingInfoFilePath);
+        var allVotingInfo = JsonConvert.DeserializeObject<Dictionary<int, VotingInfo>>(allVotingInfoJson);
+
+        if (allVotingInfo == null)
         {
-            Directory.CreateDirectory(unzippedCsvDirectory);
+            throw new Exception($"Could not load the voting info from the path {VotingInfoFilePath}");
         }
 
-        foreach (string file in Directory.EnumerateFiles(zippedCsvDirectory, "*.zip"))
+        return allVotingInfo;
+    }
+
+    internal bool AreFilesUnzipped()
+    {
+        return Directory.EnumerateFiles(UnzippedCsvDirectory, "*.csv").Count() == TotalTseFiles;
+    }
+
+    internal bool DirectoryHasAllTseZippedFiles()
+    {
+        return Directory.EnumerateFiles(ZippedCsvDirectory, "*.zip").Count() == TotalTseFiles;
+    }
+
+    internal void UnzipCsvFiles()
+    {
+        if (!Directory.Exists(UnzippedCsvDirectory))
+        {
+            Directory.CreateDirectory(UnzippedCsvDirectory);
+        }
+
+        // clear old csv files from directory
+        foreach (string file in Directory.EnumerateFiles(UnzippedCsvDirectory, "*.csv"))
+        {
+            File.Delete(file);
+        }
+
+        // unzip csv files
+        foreach (string file in Directory.EnumerateFiles(ZippedCsvDirectory, "*.zip"))
         {
             using ZipArchive archive = ZipFile.OpenRead(file);
             foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.EndsWith(".csv")))
             {
-                entry.ExtractToFile(Path.Combine(unzippedCsvDirectory, entry.FullName));
+                entry.ExtractToFile(Path.Combine(UnzippedCsvDirectory, entry.FullName));
             }
         }
     }
 
-    internal static Dictionary<int, VotingInfo> GetAllVotingInfo(string unzippedCsvDirectory)
+    internal Dictionary<int, VotingInfo> GetAllVotingInfo()
     {
+        Console.WriteLine("Aggregating information...");
         Dictionary<int, VotingInfo> votingInfoPerBallot = new();
-        foreach (string file in Directory.EnumerateFiles(unzippedCsvDirectory, "*.csv"))
+        int fileCount = 0;
+        var allCsvFiles = Directory.EnumerateFiles(UnzippedCsvDirectory, "*.csv").ToList();
+        foreach (string file in allCsvFiles)
         {
+            Console.WriteLine($"Processing file {++fileCount}/{allCsvFiles.Count}");
             using var reader = new StreamReader(file, Encoding.GetEncoding("ISO-8859-1"));
             while (!reader.EndOfStream)
             {
