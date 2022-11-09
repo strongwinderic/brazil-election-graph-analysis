@@ -1,58 +1,57 @@
-﻿namespace BrazilElectionGraphAnalysis
+﻿namespace BrazilElectionGraphAnalysis;
+
+internal class VotingInfoAggregator
 {
-    internal class VotingInfoAggregator
+    private readonly DataBuilder _dataBuilder;
+
+    public VotingInfoAggregator(DataBuilder dataBuilder)
     {
-        private readonly DataBuilder _dataBuilder;
+        _dataBuilder = dataBuilder;
+    }
 
-        public VotingInfoAggregator(DataBuilder dataBuilder)
+    internal Dictionary<int, VotingInfo> GetVotingInfo()
+    {
+        bool useVotingInfoFile = false;
+        if (_dataBuilder.VotingInfoFileExists())
         {
-            _dataBuilder = dataBuilder;
+            Console.WriteLine($"Voting file already exists on path {_dataBuilder.VotingInfoFilePath}");
+            ConsoleKeyInfo selectedOption;
+            do
+            {
+                Console.WriteLine($"Use existent file? (Y/n)");
+                selectedOption = Console.ReadKey();
+            } while (selectedOption.Key is not (ConsoleKey.Enter or ConsoleKey.Y or ConsoleKey.N));
+
+            useVotingInfoFile = selectedOption.Key is ConsoleKey.Enter or ConsoleKey.Y;
         }
 
-        internal Dictionary<int, VotingInfo> GetVotingInfo()
+        return useVotingInfoFile ? _dataBuilder.LoadVotingInfo() : BuildVotingInfo();
+
+    }
+    private Dictionary<int, VotingInfo> BuildVotingInfo()
+    {
+        if (_dataBuilder.AreFilesUnzipped())
         {
-            bool useVotingInfoFile = false;
-            if (_dataBuilder.VotingInfoFileExists())
-            {
-                Console.WriteLine($"Voting file already exists on path {_dataBuilder.VotingInfoFilePath}");
-                ConsoleKeyInfo selectedOption;
-                do
-                {
-                    Console.WriteLine($"Use existent file? (Y/n)");
-                    selectedOption = Console.ReadKey();
-                } while (selectedOption.Key is not (ConsoleKey.Enter or ConsoleKey.Y or ConsoleKey.N));
-
-                useVotingInfoFile = selectedOption.Key is ConsoleKey.Enter or ConsoleKey.Y;
-            }
-
-            return useVotingInfoFile ? _dataBuilder.LoadVotingInfo() : BuildVotingInfo();
-
+            Console.WriteLine($"TSE data unzipped file already found on directory {_dataBuilder.UnzippedCsvDirectory}");
+            Console.WriteLine("Using the unzipped data");
         }
-        private Dictionary<int, VotingInfo> BuildVotingInfo()
+        else
         {
-            if (_dataBuilder.AreFilesUnzipped())
-            {
-                Console.WriteLine($"TSE data unzipped file already found on directory {_dataBuilder.UnzippedCsvDirectory}");
-                Console.WriteLine("Using the unzipped data");
-            }
-            else
-            {
-                UnzipTseFiles();
-            }
-
-            var votingInfo = _dataBuilder.GetAllVotingInfo();
-            _dataBuilder.SaveVotingInfo(votingInfo);
-            return votingInfo;
+            UnzipTseFiles();
         }
 
-        private void UnzipTseFiles()
-        {
-            if (!_dataBuilder.DirectoryHasAllTseZippedFiles())
-            {
-                throw new Exception($"TSE files could not be found. Please copy all {DataBuilder.TotalTseFiles} zipped TSE files to directory {_dataBuilder.ZippedCsvDirectory}");
-            }
+        var votingInfo = _dataBuilder.GetAllVotingInfo();
+        _dataBuilder.SaveVotingInfo(votingInfo);
+        return votingInfo;
+    }
 
-            _dataBuilder.UnzipCsvFiles();
+    private void UnzipTseFiles()
+    {
+        if (!_dataBuilder.DirectoryHasAllTseZippedFiles())
+        {
+            throw new Exception($"TSE files could not be found. Please copy all {DataBuilder.TotalTseFiles} zipped TSE files to directory {_dataBuilder.ZippedCsvDirectory}");
         }
+
+        _dataBuilder.UnzipCsvFiles();
     }
 }

@@ -67,8 +67,15 @@ internal class DataBuilder
         }
 
         var jsonTempPath = GetTempJsonFilePath();
+        if (File.Exists(jsonTempPath))
+        {
+            File.Delete(jsonTempPath);
+        }
+
         entry.ExtractToFile(jsonTempPath);
         string allVotingInfoJson = File.ReadAllText(jsonTempPath);
+        File.Delete(jsonTempPath);
+
         var allVotingInfo = JsonConvert.DeserializeObject<Dictionary<int, VotingInfo>>(allVotingInfoJson);
 
         if (allVotingInfo == null)
