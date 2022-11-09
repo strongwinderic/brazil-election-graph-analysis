@@ -15,6 +15,8 @@ internal class DataBuilder
     private const int CityIndex = 12;
     private const int VoteNumberIndex = 29;
     private const int VoteQuantityIndex = 31;
+    private const int RoleTypeIndex = 16;
+    private const int PresidentRoleType = 1;
 
     public string ZippedCsvDirectory { get; set; }
     public string UnzippedCsvDirectory { get; set; }
@@ -55,11 +57,21 @@ internal class DataBuilder
 
     internal bool AreFilesUnzipped()
     {
+        if (!Directory.Exists(UnzippedCsvDirectory))
+        {
+            return false;
+        }
+
         return Directory.EnumerateFiles(UnzippedCsvDirectory, "*.csv").Count() == TotalTseFiles;
     }
 
     internal bool DirectoryHasAllTseZippedFiles()
     {
+        if (!Directory.Exists(ZippedCsvDirectory))
+        {
+            return false;
+        }
+
         return Directory.EnumerateFiles(ZippedCsvDirectory, "*.zip").Count() == TotalTseFiles;
     }
 
@@ -109,6 +121,13 @@ internal class DataBuilder
 
                 // if it is not a valid int, it is a header and should be skipped
                 if (!int.TryParse(values[ElectionYearIndex], out _))
+                {
+                    continue;
+                }
+
+                // if row does not contain president voting data, is should be skipped
+                int roleType = Convert.ToInt32(values[RoleTypeIndex]);
+                if (roleType != PresidentRoleType)
                 {
                     continue;
                 }

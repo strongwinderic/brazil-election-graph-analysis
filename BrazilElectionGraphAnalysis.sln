@@ -5,6 +5,12 @@ VisualStudioVersion = 17.3.32611.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrazilElectionGraphAnalysis", "BrazilElectionGraphAnalysis\BrazilElectionGraphAnalysis.csproj", "{6BEE4518-63B0-4E4A-BABC-4B939CF97502}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{19456BC7-6828-41BA-A38D-0D721CA052F5}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
