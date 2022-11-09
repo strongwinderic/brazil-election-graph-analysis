@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\AggregatedData\allVotingInfo.json">
+    <None Update="Data\AggregatedData\allVotingInfo.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\DumpFiles\README.md">

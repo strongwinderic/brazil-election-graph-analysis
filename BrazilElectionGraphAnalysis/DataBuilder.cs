@@ -38,13 +38,37 @@ internal class DataBuilder
     {
         Console.WriteLine($"Saving voting info file to {VotingInfoFilePath}");
         string allVotingInfoJson = JsonConvert.SerializeObject(allVotingInfo);
-        File.WriteAllText(VotingInfoFilePath, allVotingInfoJson);
+        var jsonTempPath = GetTempJsonFilePath();
+        string? tempDir = Path.GetDirectoryName(jsonTempPath);
+        if (tempDir == null)
+        {
+            throw new Exception("Could not save voting file.");
+        }
+
+        Directory.CreateDirectory(tempDir);
+        File.WriteAllText(jsonTempPath, allVotingInfoJson);
+        if (File.Exists(VotingInfoFilePath))
+        {
+            File.Delete(VotingInfoFilePath);
+        }
+
+        ZipFile.CreateFromDirectory(tempDir, VotingInfoFilePath);
+        File.Delete(jsonTempPath);
     }
 
     internal Dictionary<int, VotingInfo> LoadVotingInfo()
     {
         Console.WriteLine($"Loading voting info file from {VotingInfoFilePath}");
-        string allVotingInfoJson = File.ReadAllText(VotingInfoFilePath);
+        using ZipArchive archive = ZipFile.OpenRead(VotingInfoFilePath);
+        ZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e => e.FullName.Equals("VotingInfo.json"));
+        if (entry == null)
+        {
+            throw new Exception($"Path {VotingInfoFilePath} is an invalid voting info file");
+        }
+
+        var jsonTempPath = GetTempJsonFilePath();
+        entry.ExtractToFile(jsonTempPath);
+        string allVotingInfoJson = File.ReadAllText(jsonTempPath);
         var allVotingInfo = JsonConvert.DeserializeObject<Dictionary<int, VotingInfo>>(allVotingInfoJson);
 
         if (allVotingInfo == null)
@@ -77,10 +101,7 @@ internal class DataBuilder
 
     internal void UnzipCsvFiles()
     {
-        if (!Directory.Exists(UnzippedCsvDirectory))
-        {
-            Directory.CreateDirectory(UnzippedCsvDirectory);
-        }
+        Directory.CreateDirectory(UnzippedCsvDirectory);
 
         // clear old csv files from directory
         foreach (string file in Directory.EnumerateFiles(UnzippedCsvDirectory, "*.csv"))
@@ -165,5 +186,11 @@ internal class DataBuilder
         }
 
         return votingInfoPerBallot;
+    }
+
+    private static string GetTempJsonFilePath()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), "BrazilElectionGraphAnalysis");
+        return Path.Combine(tempDir, "VotingInfo.json");
     }
 }

@@ -5,7 +5,7 @@ Console.WriteLine("");
 
 string zippedCsvDirectory = ".\\Data\\DumpFiles";
 string unzippedCsvDirectory = ".\\Data\\DumpFiles\\unzipped";
-string votingInfoFilePath = ".\\Data\\AggregatedData\\allVotingInfo.json";
+string votingInfoFilePath = ".\\Data\\AggregatedData\\allVotingInfo.zip";
 
 try
 {
