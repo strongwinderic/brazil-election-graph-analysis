@@ -1,5 +1,6 @@
-﻿using BrazilElectionGraphAnalysis;
+using BrazilElectionGraphAnalysis;
 using LiveChartsCore;
+using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.SKCharts;
@@ -50,9 +51,12 @@ internal class ChartPlotter
             Height = 600,
             Series = new ISeries[]
             {
-                new LineSeries<double> { Stroke = new SolidColorPaint(SKColors.Red), Values = lulaVotesInTime },
-                new LineSeries<double> { Stroke = new SolidColorPaint(SKColors.Blue), Values = bolsonaroVotesInTime },
-            }
+                new LineSeries<double> { Name = "Lula" ,Fill = null, GeometryFill = null, GeometryStroke = null, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 6 }, Values = lulaVotesInTime } ,
+                new LineSeries<double> { Name = "Bolsonaro", Fill = null, GeometryFill = null, GeometryStroke = null, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 6 }, Values = bolsonaroVotesInTime },
+            },
+            LegendPosition = LegendPosition.Bottom,
+            YAxes =  new Axis[] { new() { MinLimit = 0, MaxLimit = 100, Labeler = (x) => $"{x}%"} },
+            XAxes =  new Axis[] { new() { Labels = new List<string>(), }}
         };
         return cartesianChart;
     }
@@ -76,7 +80,7 @@ internal class ChartPlotter
             totalVotesBolsonaro += votingInfoPerBallot.Value.BolsonaroVotes;
             int grandTotalVotes = totalVotesLula + totalVotesBolsonaro;
 
-            if (totalProcessed % 1000 == 0 || totalProcessed == randomVotingInfo.Keys.Count)
+            if (totalProcessed % 1 == 0 || totalProcessed == randomVotingInfo.Keys.Count)
             {
                 double currentLulaVotesInTime = (double)totalVotesLula * 100 / grandTotalVotes;
                 double currentBolsonaroVotesInTime = (double)totalVotesBolsonaro * 100 / grandTotalVotes;

@@ -18,7 +18,7 @@ try
     Console.WriteLine($"Invalid votes:  {allVotingInfo.Values.Sum(x => x.InvalidVotes)}");
 
     var chartPlotter = new ChartPlotter(allVotingInfo);
-    chartPlotter.PlotAndSaveSeveral(10000);
+    chartPlotter.PlotAndSaveSeveral(100);
 }
 catch (Exception ex)
 {
@@ -27,5 +27,6 @@ catch (Exception ex)
 }
 finally
 {
+    Console.WriteLine("Finished. Press any key to exit.");
     Console.ReadLine();
 }
