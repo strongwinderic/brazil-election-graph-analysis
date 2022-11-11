@@ -1,35 +1,23 @@
-using BrazilElectionGraphAnalysis;
-using LiveChartsCore;
-using LiveChartsCore.Measure;
-using LiveChartsCore.SkiaSharpView;
+﻿using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.SKCharts;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore;
 using SkiaSharp;
 
 namespace BrazilElectionGraphAnalysis;
 
-internal class ChartPlotter
+public static class ChartTools
 {
-    private readonly Dictionary<int, VotingInfo> _allVotingInfo;
-
-    public ChartPlotter(Dictionary<int, VotingInfo> allVotingInfo)
+    public static InMemorySkiaSharpChart GetVotingChart(Dictionary<int, VotingInfo> allVotingInfo, int votingCountStep)
     {
-        _allVotingInfo = allVotingInfo;
+        (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) = GetChartDataFromVotingInfo(allVotingInfo, votingCountStep);
+        return GetVotingChart(lulaVotesInTime, bolsonaroVotesInTime);
+
     }
 
-    public void PlotAndSaveSeveral(int quantity)
+    public static void SaveChart(string fileName, InMemorySkiaSharpChart chart)
     {
-        string chartDirName = $"{DateTime.Now:s}".Replace(":", "-");
-        for (int i = 1; i <= quantity; i++)
-        {
-            string fileName = $".\\GeneratedCharts\\{chartDirName}\\chart_{i:D10}.png";
-            PlotAndSave(fileName);
-        }
-    }
-
-    public void PlotAndSave(string fileName)
-    {
-        var cartesianChart = GetChartFromRandomReading();
         var dirName = Path.GetDirectoryName(fileName);
         if (dirName == null)
         {
@@ -37,14 +25,11 @@ internal class ChartPlotter
         }
 
         Directory.CreateDirectory(dirName);
-        cartesianChart.SaveImage(fileName);
+        chart.SaveImage(fileName);
     }
 
-    private SKCartesianChart GetChartFromRandomReading()
+    private static InMemorySkiaSharpChart GetVotingChart(List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime)
     {
-        Console.WriteLine("Generating chart...");
-        (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) = GetChartDataFromRandomReading();
-
         var cartesianChart = new SKCartesianChart
         {
             Width = 900,
@@ -55,13 +40,13 @@ internal class ChartPlotter
                 new LineSeries<double> { Name = "Bolsonaro", Fill = null, GeometryFill = null, GeometryStroke = null, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 6 }, Values = bolsonaroVotesInTime },
             },
             LegendPosition = LegendPosition.Bottom,
-            YAxes =  new Axis[] { new() { MinLimit = 0, MaxLimit = 100, Labeler = (x) => $"{x}%"} },
-            XAxes =  new Axis[] { new() { Labels = new List<string>(), }}
+            YAxes = new Axis[] { new() { MinLimit = 0, MaxLimit = 100, Labeler = (x) => $"{x}%" } },
+            XAxes = new Axis[] { new() { Labels = new List<string>(), } }
         };
         return cartesianChart;
     }
 
-    private (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) GetChartDataFromRandomReading()
+    private static (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) GetChartDataFromVotingInfo(Dictionary<int, VotingInfo> allVotingInfo, int votingCountStep)
     {
         int totalProcessed = 0;
         int totalVotesLula = 0;
@@ -69,22 +54,18 @@ internal class ChartPlotter
         List<double> lulaVotesInTime = new();
         List<double> bolsonaroVotesInTime = new();
 
-        Random random = new Random();
-        var randomVotingInfo = _allVotingInfo.OrderBy(x => random.Next())
-            .ToDictionary(item => item.Key, item => item.Value);
-
-        foreach (KeyValuePair<int, VotingInfo> votingInfoPerBallot in randomVotingInfo)
+        foreach (KeyValuePair<int, VotingInfo> votingInfoPerBallot in allVotingInfo)
         {
             totalProcessed++;
             totalVotesLula += votingInfoPerBallot.Value.LulaVotes;
             totalVotesBolsonaro += votingInfoPerBallot.Value.BolsonaroVotes;
             int grandTotalVotes = totalVotesLula + totalVotesBolsonaro;
 
-            if (totalProcessed % 1 == 0 || totalProcessed == randomVotingInfo.Keys.Count)
+            if (totalProcessed % votingCountStep == 0 || totalProcessed == allVotingInfo.Keys.Count)
             {
                 double currentLulaVotesInTime = (double)totalVotesLula * 100 / grandTotalVotes;
                 double currentBolsonaroVotesInTime = (double)totalVotesBolsonaro * 100 / grandTotalVotes;
-                Console.WriteLine($"Total ballots processed: {totalProcessed}/{randomVotingInfo.Keys.Count} | Lula: {currentLulaVotesInTime} | Bolsonaro: {currentBolsonaroVotesInTime}");
+                Console.WriteLine($"Total ballots processed: {totalProcessed}/{allVotingInfo.Keys.Count} | Lula: {currentLulaVotesInTime} | Bolsonaro: {currentBolsonaroVotesInTime}");
                 lulaVotesInTime.Add(currentLulaVotesInTime);
                 bolsonaroVotesInTime.Add(currentBolsonaroVotesInTime);
             }

@@ -1,6 +1,6 @@
 ﻿namespace BrazilElectionGraphAnalysis;
 
-internal class VotingInfo
+public class VotingInfo
 {
     public int BallotId { get; set; }
     public int Zone { get; set; }

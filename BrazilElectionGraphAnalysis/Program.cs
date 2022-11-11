@@ -16,9 +16,24 @@ try
     Console.WriteLine($"Lula votes: {allVotingInfo.Values.Sum(x => x.LulaVotes)}");
     Console.WriteLine($"Bolsonaro votes: {allVotingInfo.Values.Sum(x => x.BolsonaroVotes)}");
     Console.WriteLine($"Invalid votes:  {allVotingInfo.Values.Sum(x => x.InvalidVotes)}");
+    Console.WriteLine();
+    Console.WriteLine("Enter voting count step. This is the amount of ballots will be processed to update the chart. The less the number, more accurate the chart is, but more time it takes to be processed. Default is 1");
 
-    var chartPlotter = new ChartPlotter(allVotingInfo);
-    chartPlotter.PlotAndSaveSeveral(100);
+    int votingCountStep;
+    string? selection;
+    do
+    {
+        selection = Console.ReadLine();
+        if (selection?.Trim() == string.Empty)
+        {
+            selection = "1";
+        }
+
+    } while (!int.TryParse(selection, out votingCountStep));
+
+    var chartPlotter = new AnalyticsChartsBuilder(allVotingInfo, votingCountStep);
+    chartPlotter.GenerateTendencyChartAndSave();
+    chartPlotter.GenerateSeveralRandomChartsAndSave(10);
 }
 catch (Exception ex)
 {
