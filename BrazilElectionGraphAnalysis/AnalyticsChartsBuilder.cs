@@ -15,14 +15,16 @@ internal class AnalyticsChartsBuilder
         _votingCountStep = votingCountStep;
     }
 
-    public void GenerateSeveralRandomChartsAndSave(int quantity)
+    public async Task GenerateSeveralRandomChartsAndSave(int quantity, IProgress<string>? progress = default)
     {
-        string generatedRandomChartDirSubDir = $"{DateTime.Now:s}".Replace(":", "-").Replace("T", "_"); ;
-        IList<InMemorySkiaSharpChart> charts = GetSeveralRandomCharts(quantity).ToList();
-        for (int i = 0; i < charts.Count(); i++)
+        string generatedRandomChartDirSubDir = $"{DateTime.Now:s}".Replace(":", "-").Replace("T", "_");
+        int count = 0;
+        await foreach(var chart in GetSeveralRandomCharts(quantity, progress))
         {
-            string fileName = $"{GetSaveDir("RandomCharts")}\\{generatedRandomChartDirSubDir}\\chart_{i:D10}.png";
-            ChartTools.SaveChart(fileName, charts[i]);
+            count++;
+            progress?.Report($"Generating chart {count}");
+            string fileName = $"{GetSaveDir("RandomCharts")}\\{generatedRandomChartDirSubDir}\\chart_{count:D5}.png";
+            ChartTools.SaveChart(fileName, chart);
         }
     }
 
@@ -38,14 +40,14 @@ internal class AnalyticsChartsBuilder
         ChartTools.SaveChart(fileName, chart);
     }
 
-    public IEnumerable<InMemorySkiaSharpChart> GetSeveralRandomCharts(int quantity)
+    public async IAsyncEnumerable<InMemorySkiaSharpChart> GetSeveralRandomCharts(int quantity, IProgress<string>? progress = default)
     {
         Random random = new Random();
         for (int i = 1; i <= quantity; i++)
         {
             Dictionary<int, VotingInfo> randomVotingInfo = _allVotingInfo.OrderBy(_ => random.Next())
                 .ToDictionary(item => item.Key, item => item.Value);
-            InMemorySkiaSharpChart chart = ChartTools.GetVotingChart(randomVotingInfo, _votingCountStep);
+            InMemorySkiaSharpChart chart = await Task.Run(() => ChartTools.GetVotingChart(randomVotingInfo, _votingCountStep, progress));
             yield return chart;
         }
     }

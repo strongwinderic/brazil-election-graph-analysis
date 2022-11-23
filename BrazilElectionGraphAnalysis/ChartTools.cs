@@ -9,9 +9,9 @@ namespace BrazilElectionGraphAnalysis;
 
 public static class ChartTools
 {
-    public static InMemorySkiaSharpChart GetVotingChart(Dictionary<int, VotingInfo> allVotingInfo, int votingCountStep)
+    public static InMemorySkiaSharpChart GetVotingChart(Dictionary<int, VotingInfo> allVotingInfo, int votingCountStep, IProgress<string>? progress = default)
     {
-        (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) = GetChartDataFromVotingInfo(allVotingInfo, votingCountStep);
+        (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) = GetChartDataFromVotingInfo(allVotingInfo, votingCountStep, progress);
         return GetVotingChart(lulaVotesInTime, bolsonaroVotesInTime);
 
     }
@@ -46,7 +46,7 @@ public static class ChartTools
         return cartesianChart;
     }
 
-    private static (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) GetChartDataFromVotingInfo(Dictionary<int, VotingInfo> allVotingInfo, int votingCountStep)
+    private static (List<double> lulaVotesInTime, List<double> bolsonaroVotesInTime) GetChartDataFromVotingInfo(Dictionary<int, VotingInfo> allVotingInfo, int votingCountStep, IProgress<string>? progress = default)
     {
         int totalProcessed = 0;
         int totalVotesLula = 0;
@@ -65,7 +65,7 @@ public static class ChartTools
             {
                 double currentLulaVotesInTime = (double)totalVotesLula * 100 / grandTotalVotes;
                 double currentBolsonaroVotesInTime = (double)totalVotesBolsonaro * 100 / grandTotalVotes;
-                Console.WriteLine($"Total ballots processed: {totalProcessed}/{allVotingInfo.Keys.Count} | Lula: {currentLulaVotesInTime} | Bolsonaro: {currentBolsonaroVotesInTime}");
+                progress?.Report($"Total ballots processed: {totalProcessed}/{allVotingInfo.Keys.Count} | Lula: {currentLulaVotesInTime} | Bolsonaro: {currentBolsonaroVotesInTime}");
                 lulaVotesInTime.Add(currentLulaVotesInTime);
                 bolsonaroVotesInTime.Add(currentBolsonaroVotesInTime);
             }

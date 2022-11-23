@@ -32,8 +32,9 @@ try
     } while (!int.TryParse(selection, out votingCountStep));
 
     var chartPlotter = new AnalyticsChartsBuilder(allVotingInfo, votingCountStep);
-    chartPlotter.GenerateTendencyChartAndSave();
-    chartPlotter.GenerateSeveralRandomChartsAndSave(10);
+    /*chartPlotter.GenerateTendencyChartAndSave();*/
+    var progress = new Progress<string>(s => Console.WriteLine(s));
+    await chartPlotter.GenerateSeveralRandomChartsAndSave(2, progress);
 }
 catch (Exception ex)
 {
