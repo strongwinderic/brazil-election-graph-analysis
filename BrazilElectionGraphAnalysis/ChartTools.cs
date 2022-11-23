@@ -50,7 +50,7 @@ public static class ChartTools
                 new LineSeries<double> { Name = "Bolsonaro", Fill = null, GeometryFill = null, GeometryStroke = null, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 6 }, Values = bolsonaroVotesInTime },
             },
             LegendPosition = LegendPosition.Bottom,
-            YAxes = new Axis[] { new() { MinLimit = 0, MaxLimit = 100, Labeler = (x) => $"{x}%" } },
+            YAxes = new Axis[] { new() { MinLimit = 44, MaxLimit = 54, Labeler = (x) => $"{x}%" } },
             XAxes = new Axis[] { new() { Labels = new List<string>(), } }
         };
         return cartesianChart;
@@ -96,10 +96,6 @@ public static class ChartTools
         foreach (KeyValuePair<int, VotingInfo> votingInfoPerBallot in allVotingInfo)
         {
             totalProcessed++;
-            if (totalProcessed >= allVotingInfo.Count)
-            {
-                Debugger.Break();
-            }
             totalVotesLula += votingInfoPerBallot.Value.LulaVotes;
             totalVotesBolsonaro += votingInfoPerBallot.Value.BolsonaroVotes;
             int grandTotalVotes = totalVotesLula + totalVotesBolsonaro;
