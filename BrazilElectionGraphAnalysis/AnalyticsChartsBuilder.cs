@@ -1,4 +1,5 @@
 using LiveChartsCore.SkiaSharpView.SKCharts;
+using System;
 
 namespace BrazilElectionGraphAnalysis;
 
@@ -34,19 +35,24 @@ internal class AnalyticsChartsBuilder
             string fileName = $"{GetSaveDir("RandomCharts")}\\{generatedRandomChartDirSubDir}\\chart_{count:D5}.png";
             await ChartTools.SaveChartAsync(fileName, chart);
         });
-        /*await foreach(var chart in GetSeveralRandomCharts(quantity, progress))
-        {
-            count++;
-            progress?.Report($"Generating chart {count}");
-            string fileName = $"{GetSaveDir("RandomCharts")}\\{generatedRandomChartDirSubDir}\\chart_{count:D5}.png";
-            ChartTools.SaveChart(fileName, chart);
-        }*/
     }
 
     public void GenerateTendencyChartAndSave()
     {
         InMemorySkiaSharpChart chart = GetTendencyChart();
         string fileName = $"{GetSaveDir("TendencyChart")}\\tendencyChart.png";
+        if (File.Exists(fileName))
+        {
+            File.Delete(fileName);
+        }
+
+        ChartTools.SaveChart(fileName, chart);
+    }
+
+    public void GenerateStealingVotesChartAndSave()
+    {
+        InMemorySkiaSharpChart chart = GetStealingVotesChart();
+        string fileName = $"{GetSaveDir("StealingVotesChart")}\\stealingVotesChart.png";
         if (File.Exists(fileName))
         {
             File.Delete(fileName);
@@ -72,6 +78,15 @@ internal class AnalyticsChartsBuilder
         Dictionary<int, VotingInfo> tendencyVotingInfo = _allVotingInfo.OrderByDescending(x => x.Value.BolsonaroVotes)
                 .ToDictionary(item => item.Key, item => item.Value);
         InMemorySkiaSharpChart chart = ChartTools.GetVotingChart(tendencyVotingInfo, _votingCountStep);
+        return chart;
+    }
+
+    public InMemorySkiaSharpChart GetStealingVotesChart()
+    {
+        Random random = new Random();
+        Dictionary<int, VotingInfo> randomVotingInfo = _allVotingInfo.OrderBy(_ => random.Next())
+                .ToDictionary(item => item.Key, item => item.Value);
+        InMemorySkiaSharpChart chart = ChartTools.GetStealingVotingChart(randomVotingInfo, _votingCountStep);
         return chart;
     }
 
