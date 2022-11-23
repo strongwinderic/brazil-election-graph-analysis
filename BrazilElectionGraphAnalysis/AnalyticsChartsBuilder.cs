@@ -15,17 +15,32 @@ internal class AnalyticsChartsBuilder
         _votingCountStep = votingCountStep;
     }
 
-    public async Task GenerateSeveralRandomChartsAndSave(int quantity, IProgress<string>? progress = default)
+    public async Task GenerateSeveralRandomChartsAndSave(int quantity, IProgress<string>? progress = default, CancellationToken ct = default)
     {
         string generatedRandomChartDirSubDir = $"{DateTime.Now:s}".Replace(":", "-").Replace("T", "_");
         int count = 0;
-        await foreach(var chart in GetSeveralRandomCharts(quantity, progress))
+
+        ParallelOptions parallelOptions = new()
+        {
+            MaxDegreeOfParallelism = 3,
+            CancellationToken = ct
+        };
+
+        var charts = GetSeveralRandomCharts(quantity, progress);
+        await Parallel.ForEachAsync(charts, parallelOptions, async (chart, token) =>
+        {
+            count++;
+            progress?.Report($"Generating chart {count}");
+            string fileName = $"{GetSaveDir("RandomCharts")}\\{generatedRandomChartDirSubDir}\\chart_{count:D5}.png";
+            await ChartTools.SaveChartAsync(fileName, chart);
+        });
+        /*await foreach(var chart in GetSeveralRandomCharts(quantity, progress))
         {
             count++;
             progress?.Report($"Generating chart {count}");
             string fileName = $"{GetSaveDir("RandomCharts")}\\{generatedRandomChartDirSubDir}\\chart_{count:D5}.png";
             ChartTools.SaveChart(fileName, chart);
-        }
+        }*/
     }
 
     public void GenerateTendencyChartAndSave()

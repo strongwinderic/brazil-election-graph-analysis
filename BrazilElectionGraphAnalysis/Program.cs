@@ -34,7 +34,7 @@ try
     var chartPlotter = new AnalyticsChartsBuilder(allVotingInfo, votingCountStep);
     /*chartPlotter.GenerateTendencyChartAndSave();*/
     var progress = new Progress<string>(s => Console.WriteLine(s));
-    await chartPlotter.GenerateSeveralRandomChartsAndSave(2, progress);
+    await chartPlotter.GenerateSeveralRandomChartsAndSave(5, progress);
 }
 catch (Exception ex)
 {

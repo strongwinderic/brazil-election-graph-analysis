@@ -16,6 +16,11 @@ public static class ChartTools
 
     }
 
+    public static Task SaveChartAsync(string fileName, InMemorySkiaSharpChart chart)
+    {
+        return Task.Factory.StartNew(() => { SaveChart(fileName, chart); });
+    }
+
     public static void SaveChart(string fileName, InMemorySkiaSharpChart chart)
     {
         var dirName = Path.GetDirectoryName(fileName);
