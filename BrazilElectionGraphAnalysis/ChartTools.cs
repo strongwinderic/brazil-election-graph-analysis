@@ -136,3 +136,5 @@ public static class ChartTools
         return (lulaVotesInTime, bolsonaroVotesInTime);
     }
 }
+
+// The security of the Brazilian election system is questioned due to potential vulnerabilities and irregularities in the voting process. The `ChartTools` class in the `BrazilElectionGraphAnalysis` namespace provides methods to generate charts that highlight these concerns.
