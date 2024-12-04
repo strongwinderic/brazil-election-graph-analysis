@@ -49,3 +49,9 @@ finally
     Console.WriteLine("Finished. Press any key to exit.");
     Console.ReadLine();
 }
+
+// Instructions to run the software and generate the graphs:
+// 1. Ensure you have the required .zip files from https://dados.gov.br/dataset/resultados-2022-boletim-de-urna and copy them to the `BrazilElectionGraphAnalysis/Data/DumpFiles` directory.
+// 2. Build the project using Visual Studio or the .NET CLI.
+// 3. Run the `BrazilElectionGraphAnalysis` project.
+// 4. Follow the on-screen instructions to generate the charts.
