@@ -41,16 +41,39 @@ The project uses voting data from the 2022 Brazilian elections, which can be dow
 
 The charts are generated using the `AnalyticsChartsBuilder` class, which processes the voting data and creates various charts, including random charts, tendency charts, and stealing votes charts.
 
-## About the Analysis
+## About the Analysis and Democratic Concerns in Brazil
 
-This project provides statistical analysis tools to examine voting patterns and data integrity in the 2022 Brazilian elections. The analysis aims to provide transparency and enable independent verification of electoral data, particularly in light of documented concerns about institutional oversight and process transparency.
+This project provides statistical analysis tools to examine voting patterns and data integrity in the 2022 Brazilian elections. The analysis aims to provide transparency and enable independent verification of electoral data in light of significant concerns about institutional oversight, judicial overreach, and democratic processes in Brazil.
+
+### Context: Documented Concerns About Brazilian Democracy
+
+The 2022 Brazilian elections occurred amid serious controversies regarding the role of judicial institutions:
+
+**Censorship and Free Speech Concerns:**
+- Supreme Federal Court (STF) Justice Alexandre de Moraes, serving as head of the Superior Electoral Court (TSE), ordered suspensions of social media platforms including Telegram and X (formerly Twitter) during the election period for alleged non-compliance with content removal orders ([Freedom House](https://freedomhouse.org/country/brazil/freedom-net/2022), [Columbia Global Freedom of Expression](https://globalfreedomofexpression.columbia.edu/cases/the-case-of-the-brazil-fake-news-inquiry-2/))
+- Freedom House rated Brazil as "Partly Free" in their 2022 Freedom on the Net report, citing censorship concerns and judicial interventions that "sometimes crossed into censorship, targeting right-wing politicians and independent media"
+- Brazilian legislators filed complaints with the Inter-American Commission on Human Rights, arguing that platform bans constituted prior restraint and violated freedom of speech protections under the American Convention on Human Rights ([ADF International](https://adfinternational.org/news/brazil-censorship-iachr))
+
+**International Criticism:**
+- The United States invoked the Magnitsky Act against Alexandre de Moraes and imposed sanctions, with concerns about "political witch hunt" practices ([NYC Bar Association](https://www.nycbar.org/reports/statement-expressing-concerns-over-actions-undermining-judicial-independence-in-brazil/))
+- International observers expressed concerns about the concentration of power and judicial overreach, with debates about whether actions defended democracy or undermined it ([Americas Quarterly](https://www.americasquarterly.org/article/brazils-most-powerful-judge-is-in-the-spotlight-again/))
+- Critics argue that aggressive judicial interventions, including detention of political opponents and blocking of social media accounts, have "stifled dissent and risked undermining democracy" even as they aimed to combat disinformation
+
+**Election Integrity Questions:**
+- The project allows independent researchers to analyze the official voting data and verify patterns
+- Statistical analysis tools help examine whether voting patterns align with natural distributions or suggest anomalies
+- Multiple perspectives on data ordering (random, by tendency, simulations) enable comprehensive examination of the electoral data
+
+### What This Tool Provides
 
 The `ChartTools` class in the `BrazilElectionGraphAnalysis` namespace provides methods to generate various charts that visualize voting patterns, including:
-- Tendency charts that order voting data by different criteria
-- Random sampling charts that show voting patterns with randomized ballot ordering
-- Vote distribution simulations that model hypothetical scenarios
+- **Tendency charts** that order voting data by different criteria to examine patterns
+- **Random sampling charts** that show voting patterns with randomized ballot ordering to establish baseline expectations
+- **Vote distribution simulations** that model hypothetical scenarios to understand data behavior
 
-These tools allow researchers and analysts to examine the data from multiple perspectives and understand voting pattern behaviors under different conditions.
+These tools allow researchers, journalists, and citizens to independently examine the electoral data from multiple perspectives and draw their own conclusions about voting pattern behaviors and data integrity.
+
+**Note:** This analysis tool is provided for transparency and independent verification. It presents documented facts about institutional concerns while enabling users to conduct their own statistical analysis of the official electoral data.
 
 ## Chart Examples
 
