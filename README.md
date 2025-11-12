@@ -1,4 +1,15 @@
 # brazil-election-graph-analysis
+
+## Requirements
+
+To run this project, you need:
+
+- **.NET 7.0 SDK or later** - Download from [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
+- **Operating System**: Windows, Linux, or macOS
+- **Dependencies** (automatically restored via NuGet):
+  - LiveChartsCore.SkiaSharpView (v2.0.0-beta.516)
+  - Newtonsoft.Json (v13.0.1)
+
 ## Instructions to run the software and generate the graphs
 
 To run the software and generate the graphs, follow these steps:
@@ -30,11 +41,16 @@ The project uses voting data from the 2022 Brazilian elections, which can be dow
 
 The charts are generated using the `AnalyticsChartsBuilder` class, which processes the voting data and creates various charts, including random charts, tendency charts, and stealing votes charts.
 
-## Why question the security of the Brazilian election system?
+## About the Analysis
 
-The security of the Brazilian election system is questioned due to potential vulnerabilities and irregularities in the voting process. The `ChartTools` class in the `BrazilElectionGraphAnalysis` namespace provides methods to generate charts that highlight these concerns.
+This project provides statistical analysis tools to examine voting patterns and data integrity in the 2022 Brazilian elections. The analysis aims to provide transparency and enable independent verification of electoral data, particularly in light of documented concerns about institutional oversight and process transparency.
 
-For more details, refer to the `BrazilElectionGraphAnalysis/ChartTools.cs` file.
+The `ChartTools` class in the `BrazilElectionGraphAnalysis` namespace provides methods to generate various charts that visualize voting patterns, including:
+- Tendency charts that order voting data by different criteria
+- Random sampling charts that show voting patterns with randomized ballot ordering
+- Vote distribution simulations that model hypothetical scenarios
+
+These tools allow researchers and analysts to examine the data from multiple perspectives and understand voting pattern behaviors under different conditions.
 
 ## Chart Examples
 
